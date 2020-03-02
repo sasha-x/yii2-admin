@@ -1,6 +1,6 @@
 <?php
 
-namespace app\modules\admin;
+namespace sasha_x\admin;
 
 use yii\base\BootstrapInterface;
 
@@ -20,9 +20,11 @@ class Module extends \yii\base\Module implements BootstrapInterface
     public function bootstrap($app)
     {
         $module = static::getInstance();
-        $id = $module->id;
+        $moduleId = $module->id;
         $app->getUrlManager()->addRules([
-            "$id/<model:\S+>/<action>" => "$id/admin/<action>",
+            "$moduleId/<model:\S+>/<action>" => "$moduleId/admin/<action>",
+            "$moduleId/<model:\S+>" => "$moduleId/admin/index",
+            "$moduleId" => "$moduleId/admin/hello",
         ], false);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace app\modules\admin\services;
+namespace sasha_x\admin\services;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;

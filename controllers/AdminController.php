@@ -1,8 +1,8 @@
 <?php
 
-namespace app\modules\admin\controllers;
+namespace sasha_x\admin\controllers;
 
-use app\modules\admin\services\ModelDescribe;
+use sasha_x\admin\services\ModelDescribe;
 use Yii;
 use yii\base\InvalidRouteException;
 use yii\db\ActiveRecord;
@@ -32,7 +32,7 @@ class AdminController extends Controller
     /** @var string */
     protected $modelClass;
     /** @var ModelDescribe */
-    protected $searchModel;
+    protected $modelDesc;
 
     /**
      * {@inheritdoc}
@@ -71,17 +71,29 @@ class AdminController extends Controller
             throw new \yii\web\ForbiddenHttpException("Admin-only area");
         }
 
-        $modelSlug = Yii::$app->request->get('model');
         //fixit: get it shortly
         $this->modelMap = Yii::$app->controller->module->modelMap;
+
+        if($action->id == 'hello'){
+            //dumb action
+            //no model selected
+            return true;
+        }
+
+        $modelSlug = Yii::$app->request->get('model');
         $this->modelClass = $this->modelMap[$modelSlug] ?? null;
         if (empty($this->modelClass)) {
             throw new InvalidRouteException("Model $modelSlug is not configured to use here");
         }
         $this->modelSlug = $modelSlug;
-        $this->searchModel = new ModelDescribe($this->modelClass, $action->id);
+        $this->modelDesc = new ModelDescribe($this->modelClass, $action->id);
 
         return true;
+    }
+
+    public function actionHello()
+    {
+        return $this->render('hello');
     }
 
     /**
@@ -91,13 +103,13 @@ class AdminController extends Controller
      */
     public function actionIndex($model)
     {
-        $searchModel = $this->searchModel;
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $modelDesc = $this->modelDesc;
+        $dataProvider = $modelDesc->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
-            'searchModel' => $searchModel->model,
+            'searchModel' => $modelDesc->model,
             'dataProvider' => $dataProvider,
-            'columns' => $searchModel->getColumns(true, true),
+            'columns' => $modelDesc->getColumns(true, true),
         ]);
     }
 
@@ -109,7 +121,7 @@ class AdminController extends Controller
     public function actionCreate()
     {
         $model = new $this->modelClass;
-        $this->searchModel->setScenario($model, 'create');
+        $this->modelDesc->setScenario($model, 'create');
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             $id = $model->id;
@@ -134,7 +146,7 @@ class AdminController extends Controller
     {
         return $this->render('view', [
             'model' => $this->findModel($id),
-            'columns' => $this->searchModel->getColumns(true, true),
+            'columns' => $this->modelDesc->getColumns(true, true),
         ]);
     }
 
@@ -150,7 +162,7 @@ class AdminController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        $this->searchModel->setScenario($model, 'update');
+        $this->modelDesc->setScenario($model, 'update');
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             Yii::$app->getSession()->setFlash('success', Yii::t('app', $this->modelClass . ": $id updated"));
             return $this->redirect('index');    //['view', 'id' => $model->id]
@@ -183,14 +195,20 @@ class AdminController extends Controller
 
     public function render($view, $params = [])
     {
-        $params = array_merge([
+        $modelDesc = $this->modelDesc;
+        $globalParams = [
             'modelSlug' => $this->modelSlug,
-            //'modelMap' => $this->modelMap,
             'modelTitle' => Inflector::humanize($this->modelSlug),
-            'elementTitle' => $this->searchModel->getTitle(),
-            'columns' => $this->searchModel->getColumns(),
-            'title' => $this->searchModel->getTitle(),
-        ], $params);
+        ];
+
+        if ($modelDesc instanceof ModelDescribe) {
+            $globalParams += [
+                'elementTitle' => $modelDesc->getTitle(),
+                'columns' => $modelDesc->getColumns(),
+                'title' => $modelDesc->getTitle(),
+            ];
+        }
+        $params = array_merge($globalParams, $params);
         return parent::render($view, $params);
     }
 
