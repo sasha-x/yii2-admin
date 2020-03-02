@@ -143,14 +143,18 @@ class ModelDescribe extends Model
         $defaultType = 'text';
 
         $supportedTypeMap = [
-            'boolean' => ['boolean', 'bool'],
+            'boolean' => ['boolean', 'bool', 'tinyint'],
             'datetime' => ['datetime', 'date', 'timestamp', 'time'],
             'decimal' => ['decimal', 'money'],
             'integer' => ['smallint', 'integer', 'bigint'],
             //'number' => ['float'],
         ];
 
-        //'email'
+        if (strpos($column, 'email') === 0) {
+            return 'email';
+        } elseif (stripos($column, 'password') !== false) {
+            return 'password';
+        }
 
         /* May be:
          * char, string, text, boolean, smallint, integer, bigint, float, decimal, datetime,
@@ -160,12 +164,6 @@ class ModelDescribe extends Model
             return $defaultType;
         }
         $columnSchemaType = $columnSchema->type;
-
-        if (strpos($column, 'is_') === 0) {
-            return 'boolean';
-        } elseif (strpos($column, 'email') === 0) {
-            return 'email';
-        }
 
         foreach ($supportedTypeMap as $gridType => $sqlTypes) {
             if (in_array($columnSchemaType, $sqlTypes)) {

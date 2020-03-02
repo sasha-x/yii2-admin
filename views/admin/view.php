@@ -10,7 +10,7 @@ $title = $elementTitle;
 $this->title = Yii::t('app', 'View '.$modelTitle.': {name}', [
     'name' => $title,
 ]);
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', $modelTitle), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app', $modelTitle), 'url' => ["$modelSlug/index"]];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>

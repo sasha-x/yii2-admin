@@ -7,7 +7,7 @@ use yii\helpers\Inflector;
 /* @var $model app\models\Device */
 
 $this->title = Yii::t('app', "Create $modelTitle");
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', $modelTitle), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app', $modelTitle), 'url' => ["$modelSlug/index"]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="<?= $modelSlug ?>-create">

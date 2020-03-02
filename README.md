@@ -10,6 +10,8 @@ Looks like "universal CRUD" for models list you configure.
 Install
 -------
 
+### Required
+
 1. `composer require sasha-x/yii2-admin`
 
 2. In `config/web.php`
@@ -18,7 +20,7 @@ Install
 
 'modules' => [
         'admin' => [
-            'class' => 'app\modules\admin\Module',
+            'class' => 'sasha_x\admin\Module',
             'modelMap' => [
                 'user' =>  'app\models\User',
                 ... other models you like ...
@@ -31,9 +33,29 @@ $config['bootstrap'][] = 'admin';
 
 ```
 
-3. Assumed you have user model with is_admin property. If no, extend and edit AdminController code.
+### Optional
 
-4. If you have troubles with json type columns, add it to `config/web.php`
+3. Tweak scenarios for each destination model. Looks like:
+
+```php
+
+    //fields list for each action in admin module gets here
+    public function scenarios()
+    {
+        return [
+            'default' => ['username', 'email', 'plainPassword', 'status', 'is_admin'],
+            'index' => ['username', 'email', 'status', 'is_admin', 'created_at', 'last_login'],
+            'view' => ['id', 'username', 'email', 'status', 'is_admin', 'created_at', 'updated_at', 'last_login'],
+            'create' => ['username', 'email', 'plainPassword', 'is_admin'],
+            'update' => ['username', 'email', 'plainPassword', 'status', 'is_admin'],
+        ];
+    }
+
+```
+
+4. Assumed you have user model with is_admin property. If no, extend and edit AdminController code.
+
+5. If you have troubles with json type columns, add it to `config/web.php`
 
 ```php
 

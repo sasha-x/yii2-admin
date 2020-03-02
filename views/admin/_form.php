@@ -13,8 +13,23 @@ use yii\widgets\ActiveForm;
     <?php $form = ActiveForm::begin();
 
     foreach ($columns as $column) {
-        //TODO: checkbox, datetime, password & other input types
-        echo $form->field($model, $column)->textInput(['maxlength' => true]);
+        //TODO: textarea, checkbox, datetime, password & other input types
+        [$column, $format] = explode(':', $column);
+        $field = $form->field($model, $column);
+
+        switch ($format) {
+            case 'boolean':
+                $input = $field->checkbox();
+                break;
+            case 'password':
+                $input = $field->passwordInput();
+                break;
+            default:
+                $input = $field->textInput(['maxlength' => true]);
+                break;
+        }
+
+        echo $input;
     }
 
     ?>

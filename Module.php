@@ -10,10 +10,6 @@ use yii\base\BootstrapInterface;
 class Module extends \yii\base\Module implements BootstrapInterface
 {
     public $defaultRoute = 'admin';
-    /**
-     * {@inheritdoc}
-     */
-    public $controllerNamespace = 'app\modules\admin\controllers';
 
     public $modelMap = [];
 

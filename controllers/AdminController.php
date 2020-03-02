@@ -31,6 +31,7 @@ class AdminController extends Controller
 
     /** @var string */
     protected $modelClass;
+
     /** @var ModelDescribe */
     protected $modelDesc;
 
@@ -131,6 +132,7 @@ class AdminController extends Controller
 
         return $this->render('create', [
             'model' => $model,
+            'columns' => $this->modelDesc->getColumns(false, true),
         ]);
     }
 
@@ -170,6 +172,7 @@ class AdminController extends Controller
 
         return $this->render('update', [
             'model' => $model,
+            'columns' => $this->modelDesc->getColumns(false, true),
         ]);
     }
 
