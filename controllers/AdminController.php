@@ -75,7 +75,7 @@ class AdminController extends Controller
         //fixit: get it shortly
         $this->modelMap = Yii::$app->controller->module->modelMap;
 
-        if($action->id == 'hello'){
+        if ($action->id == 'hello') {
             //dumb action
             //no model selected
             return true;
@@ -92,9 +92,13 @@ class AdminController extends Controller
         return true;
     }
 
+    //default route
     public function actionHello()
     {
-        return $this->render('hello');
+        $moduleId = Yii::$app->controller->module->id;
+        $modelSlug = key($this->modelMap);
+
+        return $this->redirect("$moduleId/$modelSlug/index");
     }
 
     /**
