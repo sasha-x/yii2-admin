@@ -129,6 +129,11 @@ class ModelDescribe extends Model
         return $model->name ?? $model->title ?? $model->getPrimaryKey() ?? '';
     }
 
+    public function getShortModelName()
+    {
+        return substr(strrchr($this->modelClass, '\\'), 1);
+    }
+
     protected function fillColumnsWithTypes($columns)
     {
         foreach ($columns as &$column) {

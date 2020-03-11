@@ -130,7 +130,9 @@ class AdminController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             $id = $model->id;
-            Yii::$app->getSession()->setFlash('success', Yii::t('app', $this->modelClass . ": $id created"));
+
+            $msg = $this->modelDesc->getShortModelName() . " #$id created";
+            Yii::$app->getSession()->setFlash('success', Yii::t('app', $msg));
             return $this->redirect('index');        //['view', 'id' => $model->id]
         }
 
@@ -170,7 +172,8 @@ class AdminController extends Controller
         $model = $this->findModel($id);
         $this->modelDesc->setScenario($model, 'update');
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            Yii::$app->getSession()->setFlash('success', Yii::t('app', $this->modelClass . ": $id updated"));
+            $msg = $this->modelDesc->getShortModelName() . " #$id updated";
+            Yii::$app->getSession()->setFlash('success', Yii::t('app', $msg));
             return $this->redirect('index');    //['view', 'id' => $model->id]
         }
 
@@ -194,7 +197,8 @@ class AdminController extends Controller
     public function actionDelete($id)
     {
         if ($this->findModel($id)->delete()) {
-            Yii::$app->getSession()->setFlash('success', Yii::t('app', $this->modelClass . ": $id deleted"));
+            $msg = $this->modelDesc->getShortModelName() . " #$id deleted";
+            Yii::$app->getSession()->setFlash('success', Yii::t('app', $msg));
         }
 
         return $this->redirect([$this->modelSlug . "/index"]);
