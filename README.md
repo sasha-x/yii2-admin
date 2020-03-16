@@ -1,18 +1,31 @@
-yii2-admin
-==========
+Simple admin panel for yii2
+===========================
 
-Simple admin panel for yii2. 
 Looks like "universal CRUD" for models list you configure.
 
 Простая админ-панель БД для yii2.
 
 
-Install
--------
+Installation
+------------
+
+The preferred way to install this extension is through [composer](http://getcomposer.org/download/).
 
 ### Required
 
-1. `composer require sasha-x/yii2-admin`
+1. Either run
+
+```
+php composer.phar require --prefer-dist sasha-x/yii2-admin "*"
+```
+
+or add
+
+```
+"sasha-x/yii2-admin": "*"
+```
+
+to the require section of your `composer.json` file.
 
 2. In `config/web.php`
 
