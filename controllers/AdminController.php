@@ -45,6 +45,7 @@ class AdminController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
+                    'truncate' => ['POST'],
                 ],
             ],
             'access' => [
@@ -198,6 +199,20 @@ class AdminController extends Controller
     {
         if ($this->findModel($id)->delete()) {
             $msg = $this->modelDesc->getShortModelName() . " #$id deleted";
+            Yii::$app->getSession()->setFlash('success', Yii::t('app', $msg));
+        }
+
+        return $this->redirect([$this->modelSlug . "/index"]);
+    }
+
+    //Danger zone
+    public function actionTruncate()
+    {
+        $table = $this->modelClass::tableName();
+        $ok = Yii::$app->db->createCommand("TRUNCATE `$table`")->execute();
+
+        if ($ok) {
+            $msg = "Table `$table` truncated";
             Yii::$app->getSession()->setFlash('success', Yii::t('app', $msg));
         }
 
