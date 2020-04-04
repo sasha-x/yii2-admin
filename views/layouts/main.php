@@ -17,7 +17,7 @@ use yii\helpers\Html;
                 $classNs = explode('\\', $class);
                 $label = Html::tag('span', Html::encode(end($classNs))) . '<span class="icon"></span>';
                 echo Html::a($label, ["$id/index"], [
-                    'class' => $id === $this->context->modelSlug ? array_merge($classes, ['active']) : $classes,
+                    'class' => $id === $this->params['modelSlug'] ? array_merge($classes, ['active']) : $classes,
                 ]);
             }
             ?>

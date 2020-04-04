@@ -27,7 +27,7 @@ class AdminController extends Controller
     public $modelMap;
 
     /** @var string */
-    public $modelSlug;
+    protected $modelSlug;
 
     /** @var string */
     protected $modelClass;
@@ -60,11 +60,14 @@ class AdminController extends Controller
         ]);
     }
 
+    public function init()
+    {
+    }
+
     public function beforeAction($action)
     {
-        $r = parent::beforeAction($action);
-        if (!$r) {
-            return $r;
+        if (!parent::beforeAction($action)) {
+            return false;
         }
 
         $isAdmin = Yii::$app->user->identity->isAdmin();
@@ -73,30 +76,30 @@ class AdminController extends Controller
             throw new \yii\web\ForbiddenHttpException("Admin-only area");
         }
 
-        //fixit: get it shortly
-        $this->modelMap = Yii::$app->controller->module->modelMap;
-
-        if ($action->id == 'hello') {
-            //dumb action
-            //no model selected
-            return true;
-        }
+        $this->modelMap = $this->module->modelMap;
+        $this->getView()->params['allowTruncate'] = $this->module->allowTruncate;
 
         $modelSlug = Yii::$app->request->get('model');
+        if (empty($modelSlug)) {
+            //probably it is module start page, or incorrect route
+            $this->redirectFirst();
+            return false;
+        }
+
         $this->modelClass = $this->modelMap[$modelSlug] ?? null;
         if (empty($this->modelClass)) {
             throw new InvalidRouteException("Model $modelSlug is not configured to use here");
         }
-        $this->modelSlug = $modelSlug;
+        $this->modelSlug = $this->getView()->params['modelSlug'] = $modelSlug;
         $this->modelDesc = new ModelDescribe($this->modelClass, $action->id);
 
         return true;
     }
 
     //default route
-    public function actionHello()
+    protected function redirectFirst()
     {
-        $moduleId = Yii::$app->controller->module->id;
+        $moduleId = $this->module->id;
         $modelSlug = key($this->modelMap);
 
         return $this->redirect("$moduleId/$modelSlug/index");
@@ -208,6 +211,10 @@ class AdminController extends Controller
     //Danger zone
     public function actionTruncate()
     {
+        if (!$this->module->allowTruncate) {
+            return false;
+        }
+
         $table = $this->modelClass::tableName();
         $ok = Yii::$app->db->createCommand("TRUNCATE `$table`")->execute();
 

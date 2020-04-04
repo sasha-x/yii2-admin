@@ -16,13 +16,18 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?= Html::a(Yii::t('app', 'Create ' . $modelTitle), ["$modelSlug/create"], ['class' => 'btn btn-success']) ?>
-        <?= Html::a(Yii::t('app', 'Truncate'), ["$modelSlug/truncate"], [
-            'class' => 'btn btn-danger float-right pull-right',
-            'data' => [
-                'confirm' => Yii::t('app', 'Are you sure you want to truncate this table? You really cant revert it.'),
-                'method' => 'post',
-            ],
-        ]) ?>
+        <?php
+        if ($this->params['allowTruncate']) {
+            echo Html::a(Yii::t('app', 'Truncate'), ["$modelSlug/truncate"], [
+                'class' => 'btn btn-danger float-right pull-right',
+                'data' => [
+                    'confirm' => Yii::t('app',
+                        'Are you sure you want to truncate this table? You really cant revert it.'),
+                    'method' => 'post',
+                ],
+            ]);
+        }
+        ?>
     </p>
 
     <?php

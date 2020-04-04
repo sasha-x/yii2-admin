@@ -13,6 +13,8 @@ class Module extends \yii\base\Module implements BootstrapInterface
 
     public $modelMap = [];
 
+    public $allowTruncate = false;
+
     public function bootstrap($app)
     {
         $module = static::getInstance();
@@ -20,7 +22,7 @@ class Module extends \yii\base\Module implements BootstrapInterface
         $app->getUrlManager()->addRules([
             "$moduleId/<model:\S+>/<action>" => "$moduleId/admin/<action>",
             "$moduleId/<model:\S+>" => "$moduleId/admin/index",
-            "$moduleId" => "$moduleId/admin/hello",
+            "$moduleId" => "$moduleId/admin/index",
         ], false);
     }
 }
