@@ -34,6 +34,7 @@ to the require section of your `composer.json` file.
 'modules' => [
         'admin' => [
             'class' => 'sasha_x\admin\Module',
+            'allowTruncate' => true,
             'modelMap' => [
                 'user' =>  'app\models\User',
                 ... other models you like ...
@@ -82,3 +83,9 @@ $config['bootstrap'][] = 'admin';
     ]
 
 ```
+
+TODO
+----
+
+- readOnly flag in table map
+- fix behavior for json column
