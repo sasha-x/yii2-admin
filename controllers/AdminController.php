@@ -27,9 +27,6 @@ class AdminController extends Controller
 
     protected $modelTitle;
 
-    /** @var string */
-    protected $modelClass;
-
     /** @var ModelDescribe */
     protected $modelDesc;
 
@@ -82,12 +79,12 @@ class AdminController extends Controller
             return false;
         }
 
-        $this->modelClass = $this->findModelClass($modelSlug);
-        if (empty($this->modelClass)) {
+        $modelClass = $this->findModelClass($modelSlug);
+        if (empty($modelClass)) {
             throw new InvalidRouteException("Model $modelSlug is not configured to use here");
         }
         $this->modelTitle = Inflector::camel2words(Inflector::id2camel($modelSlug));
-        $this->modelDesc = new ModelDescribe($this->modelClass, $action->id);
+        $this->modelDesc = new ModelDescribe($modelClass, $action->id);
 
         $this->modelSlug = $this->view->params['modelSlug'] = $modelSlug;
         $this->view->params['leftMenu'] = $this->getModelMap(true);
@@ -122,9 +119,9 @@ class AdminController extends Controller
     protected function redirectFirst()
     {
         $moduleId = $this->module->id;
-        $modelSlug = key($this->modelMap);
+        $firstModelSlug = key($this->getModelMap());
 
-        return $this->redirect("$moduleId/$modelSlug/index");
+        return $this->redirect("$moduleId/$firstModelSlug/index");
     }
 
     /**
@@ -151,8 +148,7 @@ class AdminController extends Controller
      */
     public function actionCreate()
     {
-        $model = new $this->modelClass;
-        $this->modelDesc->setScenario($model, 'create');
+        $model = $this->modelDesc->newModel();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             $id = $model->id;
@@ -179,7 +175,7 @@ class AdminController extends Controller
     public function actionView($model, $id)
     {
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $this->modelDesc->findModel($id, 'view'),
             'columns' => $this->modelDesc->getColumns(true, true),
         ]);
     }
@@ -195,8 +191,8 @@ class AdminController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
-        $this->modelDesc->setScenario($model, 'update');
+        $model = $this->modelDesc->findModel($id, 'update');
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             $msg = $this->modelTitle . " #$id updated";
             Yii::$app->getSession()->setFlash('success', Yii::t('app', $msg));
@@ -222,7 +218,7 @@ class AdminController extends Controller
     //TODO: check results, show errors
     public function actionDelete($id)
     {
-        if ($this->findModel($id)->delete()) {
+        if ($this->modelDesc->findModel($id)->delete()) {
             $msg = $this->modelTitle . " #$id deleted";
             Yii::$app->getSession()->setFlash('success', Yii::t('app', $msg));
         }
@@ -237,7 +233,7 @@ class AdminController extends Controller
             return false;
         }
 
-        $table = $this->modelClass::tableName();
+        $table = $this->modelDesc->tableName();
         $ok = Yii::$app->db->createCommand("TRUNCATE `$table`")->execute();
 
         if ($ok) {
@@ -250,40 +246,19 @@ class AdminController extends Controller
 
     public function render($view, $params = [])
     {
-        $modelDesc = $this->modelDesc;
         $globalParams = [
             'modelSlug' => $this->modelSlug,
             'modelTitle' => $this->modelTitle,
         ];
 
+        $modelDesc = $this->modelDesc;
         if ($modelDesc instanceof ModelDescribe) {
             $globalParams += [
                 'elementTitle' => $modelDesc->getTitle(),
                 'columns' => $modelDesc->getColumns(),
-                'title' => $modelDesc->getTitle(),
             ];
         }
         $params = array_merge($globalParams, $params);
         return parent::render($view, $params);
-    }
-
-    /**
-     * Finds the model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     *
-     * @param integer $id
-     *
-     * @return ActiveRecord the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
-    {
-        $modelClass = $this->modelClass;
-        /** @var ActiveRecord $model */
-        if (($model = $modelClass::findOne($id)) !== null) {
-            return $model;
-        }
-
-        throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
     }
 }
