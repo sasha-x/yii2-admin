@@ -12,6 +12,8 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Inflector;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\helpers\StringHelper;
+use yii\web\ForbiddenHttpException;
 
 /**
  * Default controller for the `admin` module
@@ -20,14 +22,10 @@ class AdminController extends Controller
 {
     public $layout = 'main';
 
-    /**
-     * @var array
-     * Need in layout
-     */
-    public $modelMap;
-
     /** @var string */
     protected $modelSlug;
+
+    protected $modelTitle;
 
     /** @var string */
     protected $modelClass;
@@ -60,8 +58,14 @@ class AdminController extends Controller
         ]);
     }
 
-    public function init()
+    protected function checkAccess($action)
     {
+        $isAdmin = Yii::$app->user->identity->isAdmin();
+
+        if (!$isAdmin) {
+            throw new ForbiddenHttpException("Admin-only area");
+        }
+        return true;
     }
 
     public function beforeAction($action)
@@ -69,15 +73,7 @@ class AdminController extends Controller
         if (!parent::beforeAction($action)) {
             return false;
         }
-
-        $isAdmin = Yii::$app->user->identity->isAdmin();
-
-        if (!$isAdmin) {
-            throw new \yii\web\ForbiddenHttpException("Admin-only area");
-        }
-
-        $this->modelMap = $this->module->modelMap;
-        $this->getView()->params['allowTruncate'] = $this->module->allowTruncate;
+        $this->checkAccess($action);
 
         $modelSlug = Yii::$app->request->get('model');
         if (empty($modelSlug)) {
@@ -86,14 +82,40 @@ class AdminController extends Controller
             return false;
         }
 
-        $this->modelClass = $this->modelMap[$modelSlug] ?? null;
+        $this->modelClass = $this->findModelClass($modelSlug);
         if (empty($this->modelClass)) {
             throw new InvalidRouteException("Model $modelSlug is not configured to use here");
         }
-        $this->modelSlug = $this->getView()->params['modelSlug'] = $modelSlug;
+        $this->modelTitle = Inflector::camel2words(Inflector::id2camel($modelSlug));
         $this->modelDesc = new ModelDescribe($this->modelClass, $action->id);
 
+        $this->modelSlug = $this->view->params['modelSlug'] = $modelSlug;
+        $this->view->params['leftMenu'] = $this->getModelMap(true);
+        $this->view->params['allowTruncate'] = $this->module->allowTruncate;
+
         return true;
+    }
+
+    protected function getModelMap($shortNames = false)
+    {
+        $map = [];
+        foreach ($this->module->models as $model) {
+            $basename = StringHelper::basename($model);
+            $slug = Inflector::camel2id($basename);
+            $map[$slug] = ($shortNames) ? $basename : $model;
+        }
+        return $map;
+    }
+
+    protected function findModelClass($modelSlug)
+    {
+        foreach ($this->module->models as $model) {
+            $slug = Inflector::camel2id(StringHelper::basename($model));
+            if ($slug == $modelSlug) {
+                return $model;
+            }
+        }
+        return null;
     }
 
     //default route
@@ -135,9 +157,9 @@ class AdminController extends Controller
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             $id = $model->id;
 
-            $msg = $this->modelDesc->getShortModelName() . " #$id created";
+            $msg = $this->modelTitle . " #$id created";
             Yii::$app->getSession()->setFlash('success', Yii::t('app', $msg));
-            return $this->redirect('index');        //['view', 'id' => $model->id]
+            return $this->redirect('index');
         }
 
         return $this->render('create', [
@@ -176,7 +198,7 @@ class AdminController extends Controller
         $model = $this->findModel($id);
         $this->modelDesc->setScenario($model, 'update');
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            $msg = $this->modelDesc->getShortModelName() . " #$id updated";
+            $msg = $this->modelTitle . " #$id updated";
             Yii::$app->getSession()->setFlash('success', Yii::t('app', $msg));
             return $this->redirect('index');    //['view', 'id' => $model->id]
         }
@@ -201,7 +223,7 @@ class AdminController extends Controller
     public function actionDelete($id)
     {
         if ($this->findModel($id)->delete()) {
-            $msg = $this->modelDesc->getShortModelName() . " #$id deleted";
+            $msg = $this->modelTitle . " #$id deleted";
             Yii::$app->getSession()->setFlash('success', Yii::t('app', $msg));
         }
 
@@ -231,7 +253,7 @@ class AdminController extends Controller
         $modelDesc = $this->modelDesc;
         $globalParams = [
             'modelSlug' => $this->modelSlug,
-            'modelTitle' => Inflector::humanize($this->modelSlug),
+            'modelTitle' => $this->modelTitle,
         ];
 
         if ($modelDesc instanceof ModelDescribe) {

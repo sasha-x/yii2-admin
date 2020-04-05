@@ -1,4 +1,5 @@
 <?php
+
 use yii\helpers\Html;
 
 /* @var $this \yii\web\View */
@@ -12,12 +13,15 @@ use yii\helpers\Html;
     <div class="col-md-2 col-sm-3">
         <div class="list-group">
             <?php
-            $classes = ['list-group-item', 'd-flex', 'justify-content-between', 'align-items-center'];
-            foreach ($this->context->modelMap as $id => $class) {
-                $classNs = explode('\\', $class);
-                $label = Html::tag('span', Html::encode(end($classNs))) . '<span class="icon"></span>';
-                echo Html::a($label, ["$id/index"], [
-                    'class' => $id === $this->params['modelSlug'] ? array_merge($classes, ['active']) : $classes,
+            $baseClasses = ['list-group-item', 'd-flex', 'justify-content-between', 'align-items-center'];
+            foreach ($this->params['leftMenu'] as $slug => $className) {
+                $label = Html::tag('span', Html::encode($className)) . '<span class="icon"></span>';
+
+                $classes = ($slug === $this->params['modelSlug']) ? array_merge($baseClasses,
+                    ['active']) : $baseClasses;
+
+                echo Html::a($label, ["$slug/index"], [
+                    'class' => $classes,
                 ]);
             }
             ?>

@@ -63,14 +63,14 @@ class ModelDescribe extends Model
      *
      * @return string[]
      */
-    public function getColumns($withPk = false, $withType = false)
+    public function getColumns($withPk = false, $withTypes = false)
     {
         $columns = $this->safeAttrs;
         if ($withPk) {
             array_unshift($columns, $this->pk);
         }
 
-        if ($withType) {
+        if ($withTypes) {
             $columns = $this->fillColumnsWithTypes($columns);
         }
 
@@ -127,11 +127,6 @@ class ModelDescribe extends Model
     {
         $model = $this->model;
         return $model->name ?? $model->title ?? $model->getPrimaryKey() ?? '';
-    }
-
-    public function getShortModelName()
-    {
-        return substr(strrchr($this->modelClass, '\\'), 1);
     }
 
     protected function fillColumnsWithTypes($columns)

@@ -11,7 +11,7 @@ class Module extends \yii\base\Module implements BootstrapInterface
 {
     public $defaultRoute = 'admin';
 
-    public $modelMap = [];
+    public $models = [];
 
     public $allowTruncate = false;
 

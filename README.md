@@ -35,9 +35,9 @@ to the require section of your `composer.json` file.
         'admin' => [
             'class' => 'sasha_x\admin\Module',
             'allowTruncate' => true,
-            'modelMap' => [
-                'user' =>  'app\models\User',
-                ... other models you like ...
+            'models' => [
+                'app\models\User',
+                ... other models you need to edit ...
             ]
         ],
     ],
