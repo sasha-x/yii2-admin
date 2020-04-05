@@ -67,25 +67,10 @@ $config['bootstrap'][] = 'admin';
 
 ```
 
-4. Assumed you have user model with is_admin property. If no, extend and edit AdminController code.
-
-5. If you have troubles with json type columns, add it to `config/web.php`
-
-```php
-
-'container' => [
-        'definitions' => [
-            \yii\db\mysql\ColumnSchema::class => [
-                'class' => \yii\db\mysql\ColumnSchema::class,
-                'disableJsonSupport' => true,
-            ],
-        ],
-    ]
-
-```
+4. Assumed you have user model with is_admin property. If no, extend and edit AdminController::checkAccess() code.
 
 TODO
 ----
 
 - readOnly flag in table map
-- fix behavior for json column
+- model relations process
