@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\DeviceSearch */
@@ -57,11 +58,16 @@ $this->params['breadcrumbs'][] = $this->title;
         'controller' => $modelSlug,
     ];
 
+    Pjax::begin();
+
     echo GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => $columnsList,
-    ]); ?>
+    ]);
+
+    Pjax::end();
+    ?>
 
 
 </div>

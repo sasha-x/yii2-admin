@@ -65,6 +65,11 @@ class AdminController extends Controller
         return true;
     }
 
+    protected function getModelClassList()
+    {
+        return $this->module->models;
+    }
+
     public function beforeAction($action)
     {
         if (!parent::beforeAction($action)) {
@@ -86,17 +91,15 @@ class AdminController extends Controller
         $this->modelTitle = Inflector::camel2words(Inflector::id2camel($modelSlug));
         $this->modelDesc = new ModelDescribe($modelClass, $action->id);
 
-        $this->modelSlug = $this->view->params['modelSlug'] = $modelSlug;
-        $this->view->params['leftMenu'] = $this->getModelMap(true);
-        $this->view->params['allowTruncate'] = $this->module->allowTruncate;
+        $this->modelSlug = $modelSlug;
 
         return true;
     }
 
-    protected function getModelMap($shortNames = false)
+    protected function getModelMap($shortNames = true)
     {
         $map = [];
-        foreach ($this->module->models as $model) {
+        foreach ($this->getModelClassList() as $model) {
             $basename = StringHelper::basename($model);
             $slug = Inflector::camel2id($basename);
             $map[$slug] = ($shortNames) ? $basename : $model;
@@ -106,7 +109,7 @@ class AdminController extends Controller
 
     protected function findModelClass($modelSlug)
     {
-        foreach ($this->module->models as $model) {
+        foreach ($this->getModelClassList() as $model) {
             $slug = Inflector::camel2id(StringHelper::basename($model));
             if ($slug == $modelSlug) {
                 return $model;
@@ -119,7 +122,7 @@ class AdminController extends Controller
     protected function redirectFirst()
     {
         $moduleId = $this->module->id;
-        $firstModelSlug = key($this->getModelMap());
+        $firstModelSlug = key($this->getModelMap(false));
 
         return $this->redirect("$moduleId/$firstModelSlug/index");
     }
@@ -246,6 +249,10 @@ class AdminController extends Controller
 
     public function render($view, $params = [])
     {
+        $this->view->params['modelSlug'] = $this->modelSlug;
+        $this->view->params['leftMenu'] = $this->getModelMap(true);
+        $this->view->params['allowTruncate'] = $this->module->allowTruncate;
+
         $globalParams = [
             'modelSlug' => $this->modelSlug,
             'modelTitle' => $this->modelTitle,
