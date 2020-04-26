@@ -2,6 +2,7 @@ Simple admin panel for yii2
 ===========================
 
 Looks like "universal CRUD" for models list you configure.
+Inspired by PhpMyAdmin & SonataAdminBundle
 
 Простая админ-панель БД для yii2.
 
@@ -42,7 +43,7 @@ to the require section of your `composer.json` file.
         ],
     ],
 
-
+//Need to add custom routing
 $config['bootstrap'][] = 'admin';
 
 ```
@@ -67,10 +68,20 @@ $config['bootstrap'][] = 'admin';
 
 ```
 
-4. Assumed you have user model with is_admin property. If no, extend and edit AdminController::checkAccess() code.
+3.b. Make `UserAdmin` model class, if you don't want to touch basic model.
+
+4. Assumed you have User model with is_admin property. If no, extend and edit AdminController::checkAccess() code.
 
 TODO
 ----
 
 - readOnly flag in table map
 - model relations process
+
+- релейшены = лейблы / отключаемые
+- названия сценариев - константами/переменными
+- расширеные тайпхинты для gridview и _form
+- вынос конфига из центрального в модульный
+
+- кастомные страницы
+- modal, jexcel
