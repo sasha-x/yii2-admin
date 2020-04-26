@@ -1,7 +1,8 @@
 <?php
 
 use yii\helpers\Html;
-use yii\widgets\ActiveForm;
+use yii\bootstrap\ActiveForm;
+use yii\helpers\Json;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Device */
@@ -10,12 +11,25 @@ use yii\widgets\ActiveForm;
 
 <div class=<?= $modelSlug ?>"-form">
 
-    <?php $form = ActiveForm::begin();
+    <?php $form = ActiveForm::begin([
+        'layout' => 'horizontal',
+        'fieldConfig' => [
+            'horizontalCssClasses' => [
+                'offset' => 'col-sm-offset-3',
+                'label' => 'col-sm-2',
+                'wrapper' => 'col-sm-9',
+                'error' => '',
+                'hint' => 'col-sm-3',
+            ],
+        ],
+    ]);
 
     foreach ($columns as $column) {
         //TODO: textarea, checkbox, datetime, password & other input types
         [$column, $format] = explode(':', $column);
+        /** @var \yii\widgets\ActiveField $field */
         $field = $form->field($model, $column);
+        $value = Html::getAttributeValue($model, $column);
 
         switch ($format) {
             case 'boolean':
@@ -25,7 +39,14 @@ use yii\widgets\ActiveForm;
                 $input = $field->passwordInput();
                 break;
             default:
-                $input = $field->textInput(['maxlength' => true]);
+                if (is_array($value)) {
+                    $value = Json::encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE |  JSON_PRETTY_PRINT);
+                    $input = $field->textarea([
+                        'value' => $value,
+                    ]);
+                } else {
+                    $input = $field->textInput(['maxlength' => true]);
+                }
                 break;
         }
 
