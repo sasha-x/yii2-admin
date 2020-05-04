@@ -40,6 +40,7 @@ use yii\helpers\Json;
                 break;
             default:
                 if (is_array($value)) {
+                    //probably json field
                     $value = Json::encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE |  JSON_PRETTY_PRINT);
                     $input = $field->textarea([
                         'value' => $value,
