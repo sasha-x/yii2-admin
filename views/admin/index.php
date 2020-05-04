@@ -32,27 +32,15 @@ $this->params['breadcrumbs'][] = $this->title;
     </p>
 
     <?php
-    $columnsList = [];
 
+    $this->registerJs(<<<'JS'
+//small by default
+$('.grid-view thead td input.form-control').prop('size', '5');
+JS
+    );
 
-    //$columnsList[] = ['class' => 'yii\grid\SerialColumn'];
-
-    //model columns list to show
-    foreach ($columns as $column) {
-        [$column, $format] = explode(':', $column);
-        $columnAttrs = [
-            'attribute' => $column,
-            'format' => $format,
-        ];
-        if ($format != 'boolean') {
-            $columnAttrs['filterInputOptions'] = [
-                'class' => 'form-control',
-                'id' => null,
-                'size' => '10',
-            ];
-        }
-        $columnsList[] = $columnAttrs;
-    }
+    $columnsList[] = ['class' => 'yii\grid\SerialColumn'];
+    $columnsList = array_merge($columnsList, $columns);
     $columnsList[] = [
         'class' => 'yii\grid\ActionColumn',
         'controller' => $modelSlug,
@@ -62,7 +50,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     echo GridView::widget([
         'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
+        //'filterModel' => $searchModel,
         'columns' => $columnsList,
     ]);
 
