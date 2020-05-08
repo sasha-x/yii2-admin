@@ -72,6 +72,28 @@ $config['bootstrap'][] = 'admin';
 
 4. Assumed you have User model with is_admin property. If no, extend and edit AdminController::checkAccess() code.
 
+Change defaults
+---------------
+
+Example:
+
+```php
+//new default values set
+Yii::$container->setDefinitions([
+    'yii\data\Pagination' => [
+        'defaultPageSize' => 40,
+    ],
+    'yii\grid\ActionColumn' => [
+        'template' => '{update} {delete}',
+    ],
+    'yii\i18n\Formatter' => [
+        'dateFormat' => 'php:Y-m-d',
+        'timeFormat' => 'php:H:i:s',
+        'datetimeFormat' => 'php:Y-m-d H:i:s',
+    ],
+]);
+```
+
 TODO
 ----
 

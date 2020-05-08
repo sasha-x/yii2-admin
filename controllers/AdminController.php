@@ -136,9 +136,9 @@ class AdminController extends Controller
     {
         $modelDesc = $this->modelDesc;
         $dataProvider = $modelDesc->search(Yii::$app->request->queryParams);
-
+        
         return $this->render('index', [
-            'searchModel' => $modelDesc->model,
+            'searchModel' => $modelDesc->searchModel,
             'dataProvider' => $dataProvider,
             'columns' => $modelDesc->getColumns(true, true),
         ]);

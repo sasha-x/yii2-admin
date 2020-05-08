@@ -23,6 +23,7 @@ class ModelDescribe extends Model
     ];
 
     public $defaultType = 'text';
+    public $searchModel;
 
     protected $modelClass;
     protected $pk;
@@ -40,11 +41,13 @@ class ModelDescribe extends Model
         $this->pk = current($modelClass::primaryKey());
         /** @var ActiveRecord $model */
         $model = new $modelClass;
-
+        $searchModel = clone $model;
+        
         $this->setScenario($model, $scenario);
         $this->safeAttrs = $model->safeAttributes();
         $this->modelClass = $modelClass;
         $this->model = $model;
+        $this->searchModel = $searchModel;
     }
 
 
@@ -155,14 +158,14 @@ class ModelDescribe extends Model
             'sort' => ['defaultOrder' => [$this->pk => SORT_ASC]],
         ]);
 
-        $this->model->load($params);
+        $this->searchModel->load($params);
 
         // grid filtering conditions
         $query->andFilterWhere([
-            $this->pk => $this->model->getPrimaryKey(),
+            $this->pk => $this->searchModel->getPrimaryKey(),
         ]);
 
-        $model = $this->model;
+        $model = $this->searchModel;
         foreach ($this->safeAttrs as $attr) {
             if (isset($model->$attr)) {
                 $query->andFilterWhere(['like', $attr, $model->$attr]);
