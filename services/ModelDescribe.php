@@ -14,6 +14,9 @@ class ModelDescribe extends Model
 {
     public $model;
 
+    /**
+     * @var \string[][] As $gridType => $sqlTypes[]
+     */
     public $supportedTypeMap = [
         'boolean' => ['boolean', 'bool', 'tinyint'],
         'datetime' => ['datetime', 'date', 'timestamp', 'time'],

@@ -3,6 +3,7 @@
 namespace sasha_x\admin;
 
 use yii\base\BootstrapInterface;
+use Yii;
 
 /**
  * admin module definition class
@@ -14,6 +15,8 @@ class Module extends \yii\base\Module implements BootstrapInterface
     public $models = [];
 
     public $allowTruncate = false;
+
+    public $customViewsPath = null;
 
     public function bootstrap($app)
     {

@@ -35,11 +35,13 @@ to the require section of your `composer.json` file.
 'modules' => [
         'admin' => [
             'class' => 'sasha_x\admin\Module',
-            'allowTruncate' => true,
             'models' => [
                 'app\models\User',
                 ... other models you need to edit ...
-            ]
+            ],
+            //optionally
+            'allowTruncate' => true,
+            'customViewsPath' => '@app/views/admin',
         ],
     ],
 
@@ -94,6 +96,11 @@ Yii::$container->setDefinitions([
 ]);
 ```
 
+Custom views
+------------
+
+...
+
 TODO
 ----
 
@@ -107,3 +114,4 @@ TODO
 
 - кастомные страницы
 - modal, jexcel
+

@@ -14,6 +14,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\helpers\StringHelper;
 use yii\web\ForbiddenHttpException;
+use sasha_x\admin\components\View;
 
 /**
  * Default controller for the `admin` module
@@ -92,6 +93,12 @@ class AdminController extends Controller
         $this->modelDesc = new ModelDescribe($modelClass, $action->id);
 
         $this->modelSlug = $modelSlug;
+        $viewObj = Yii::createObject([
+            'class' => View::class,
+            'customViewsPath' => $this->module->customViewsPath,
+            'modelSlug' => $modelSlug,
+        ]);
+        $this->setView($viewObj);
 
         return true;
     }
@@ -136,7 +143,7 @@ class AdminController extends Controller
     {
         $modelDesc = $this->modelDesc;
         $dataProvider = $modelDesc->search(Yii::$app->request->queryParams);
-        
+
         return $this->render('index', [
             'searchModel' => $modelDesc->searchModel,
             'dataProvider' => $dataProvider,
@@ -268,4 +275,22 @@ class AdminController extends Controller
         $params = array_merge($globalParams, $params);
         return parent::render($view, $params);
     }
+
+    /**
+     * @param string $view
+     */
+    /*protected function findView($view)
+    {
+        if ($this->module->customViewsPath) {
+            $path = (strpos($view, '/') === false) ? "{$this->modelSlug}/$view" : $view;
+            $path = $this->module->customViewsPath . "/$path";
+            $file = $this->getView()->findViewFile($path);
+            if ($file && file_exists($file)) {
+                //custom view file found
+                return $path;
+            }
+        }
+        //return default
+        return $view;
+    }*/
 }
