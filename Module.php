@@ -18,6 +18,29 @@ class Module extends \yii\base\Module implements BootstrapInterface
 
     public $customViewsPath = null;
 
+    public function init()
+    {
+        parent::init();
+
+        /*Yii::$container->setDefinitions([
+            \yii\db\mysql\ColumnSchema::class => [
+                'class' => \yii\db\mysql\ColumnSchema::class,
+                'disableJsonSupport' => true,
+            ],
+        ]);*/
+
+    }
+
+    public function beforeAction($action)
+    {
+        if (!parent::beforeAction($action)) {
+            return false;
+        }
+
+        // your custom code here
+        return true; // or false to not run the action
+    }
+
     public function bootstrap($app)
     {
         $module = static::getInstance();
