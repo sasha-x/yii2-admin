@@ -71,6 +71,22 @@ class AdminController extends Controller
         return $this->module->models;
     }
 
+    public function init()
+    {
+        parent::init();
+
+        $modelSlug = Yii::$app->request->get('model');
+        $conf = [
+            'class' => View::class,
+            'customViewsPath' => $this->module->customViewsPath,
+            'modelSlug' => $modelSlug,
+        ];
+        Yii::$app->set('view', $conf);
+
+        $this->modelSlug = $modelSlug;
+    }
+
+
     public function beforeAction($action)
     {
         if (!parent::beforeAction($action)) {
@@ -78,7 +94,7 @@ class AdminController extends Controller
         }
         $this->checkAccess($action);
 
-        $modelSlug = Yii::$app->request->get('model');
+        $modelSlug = $this->modelSlug;
         if (empty($modelSlug)) {
             //probably it is module start page, or incorrect route
             $this->redirectFirst();
@@ -91,14 +107,6 @@ class AdminController extends Controller
         }
         $this->modelTitle = Inflector::camel2words(Inflector::id2camel($modelSlug));
         $this->modelDesc = new ModelDescribe($modelClass, $action->id);
-
-        $this->modelSlug = $modelSlug;
-        $viewObj = Yii::createObject([
-            'class' => View::class,
-            'customViewsPath' => $this->module->customViewsPath,
-            'modelSlug' => $modelSlug,
-        ]);
-        $this->setView($viewObj);
 
         return true;
     }
@@ -275,22 +283,4 @@ class AdminController extends Controller
         $params = array_merge($globalParams, $params);
         return parent::render($view, $params);
     }
-
-    /**
-     * @param string $view
-     */
-    /*protected function findView($view)
-    {
-        if ($this->module->customViewsPath) {
-            $path = (strpos($view, '/') === false) ? "{$this->modelSlug}/$view" : $view;
-            $path = $this->module->customViewsPath . "/$path";
-            $file = $this->getView()->findViewFile($path);
-            if ($file && file_exists($file)) {
-                //custom view file found
-                return $path;
-            }
-        }
-        //return default
-        return $view;
-    }*/
 }
